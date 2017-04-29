@@ -1,0 +1,64 @@
+<?php 
+$helper = Mage::helper('lwmyoutube');
+$channel_id = Mage::getStoreConfig('lwmyoutubesetting/general/channel');
+if($channel_id)
+{
+  $token = $_POST['token'];
+  if($token=='next')
+  {
+    $token =Mage::getSingleton('core/session')->getNextPageToken();
+  }else
+  {
+    $token =Mage::getSingleton('core/session')->getPrevPageToken();
+  }
+  $videos = $helper->getVideos($token);
+  $nextPageToken = $videos['nextPageToken'];
+  $prevPageToken = $videos['prevPageToken'];
+  Mage::getSingleton('core/session')->setPrevPageToken($prevPageToken);
+  Mage::getSingleton('core/session')->setNextPageToken($nextPageToken);
+  if(sizeof($videos)>0){
+?>
+          <?php foreach ($videos['items'] as $key => $video) { 
+			$url = $video->snippet->thumbnails->medium->url;
+            ?>
+            <div class="row video">
+			<div class="yt-lockup-thumbnail col-md-4">
+                 <a href="javascript:void(0);" onclick="changeVideo(this)" data-iframe-src="//www.youtube.com/embed/<?php echo $video->snippet->resourceId->videoId; ?>?autoplay=1&rel=0&showinfo=0&autohide=1">
+                    <img src="<?php echo $url; ?>" alt="<?php echo $media->group->title; ?>"/>
+                </a>
+			</div>
+            <div class="yt-lockup-content col-md-8">			
+                <h3><a href="javascript:void(0);" onClick="changeVideo(this)" data-iframe-src="//www.youtube.com/embed/<?php echo $video->snippet->resourceId->videoId; ?>?autoplay=1&rel=0&showinfo=0&autohide=1"><?php echo $video->snippet->title; ?></a>          </h3>
+				<div class="youtube-date">
+				<?php 
+				$today     = new DateTime();
+				$publishedAt = new DateTime($video->snippet->publishedAt);
+				$interval  = $today->diff($publishedAt);
+				$year=$interval->format('%y');
+				if($year){
+					echo $year=$interval->format('%y years ago ');
+				}else{
+					echo $interval->format('%m months ago');
+				}
+				?>
+				</div>
+				<?php 
+				$description = strip_tags($video->snippet->description);
+
+					if (strlen($description) > 180) {
+
+						// truncate string
+						$stringCut = substr($description, 0, 180);
+
+						// make sure it ends in a word so assassinate doesn't become ass...
+						$description = substr($stringCut, 0, strrpos($stringCut, ' ')).'...'; 
+					}
+					
+?>
+                 <p><?php echo $description; ?></p>
+			</div>	 
+            </div>
+          <?php } ?>
+<?php
+} }
+?>

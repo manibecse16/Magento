@@ -1,0 +1,9 @@
+Added the block in page.
+
+{{block type="core/template" template="lwmyoutube/index.phtml"}}
+
+
+System->Configuration->Youtube Feed->Youtube Feed Settings
+
+Then enter the Username,APIKEY and Channel id of google API.
+
